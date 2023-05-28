@@ -1,7 +1,7 @@
 #!/bin/bash
 # A script that creates initial tables and schemas and ingests data located in /opt/data
 # If schemas exist already, don't bother running
-export SCHEMA_CHECK="SELECT CASE WHEN EXISTS(SELECT schema_name FROM information_schema.schemata WHERE schema_name IN ('anime', 'exoplanet')) THEN 1 ELSE 0 END AS exist"
+SCHEMA_CHECK="SELECT CASE WHEN EXISTS(SELECT schema_name FROM information_schema.schemata WHERE schema_name IN ('anime', 'exoplanet')) THEN 1 ELSE 0 END AS exist"
 if [ $( psql -qtAX -d datalab-db -U datalab -c "${SCHEMA_CHECK}") -eq 1 ]
     then
         echo "Data already loaded. Entering shell..."
@@ -13,7 +13,7 @@ fi
 psql -qtAX -U datalab -d datalab-db -f /opt/data/ddl/schemas.sql -f /opt/data/ddl/anime.sql -f /opt/data/ddl/exoplanet.sql
 # Load data
 # Anime
-export ANIME_TABLES=$( for file in $(ls /opt/data/*anime*.csv); do basename $file .csv; done)
+ANIME_TABLES=$( for file in $(ls /opt/data/*anime*.csv); do basename $file .csv; done)
 for table in $ANIME_TABLES
     do
         if [ $(psql -qtAX -d datalab-db -U datalab -c "SELECT COUNT(*) FROM anime.${table} LIMIT 1") -eq 0 ]
@@ -23,7 +23,7 @@ for table in $ANIME_TABLES
     done
 # Exoplanet
 # Create tables
-export EXOPLANET_TABLES="dim_planet dim_star fact_planet_star raw_exoplanet"
+EXOPLANET_TABLES="dim_planet dim_star fact_planet_star raw_exoplanet"
 for table in $EXOPLANET_TABLES
     do
         if [ $(psql -qtAX -d datalab-db -U datalab -c "SELECT COUNT(*) FROM exoplanet.${table} LIMIT 1") -eq 0 ]
